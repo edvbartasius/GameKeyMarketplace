@@ -1,5 +1,5 @@
 backendServer/.env
 backendServer/node_modules
 
-frontendServer/.env
-frontendServer/node_modules
+frontendserver/.env
+frontendserver/node_modules
