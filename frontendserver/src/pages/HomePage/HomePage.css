@@ -1,0 +1,14 @@
+.hero-section {
+  background-color: var(--color-purple-dark);
+}
+
+.hero-title {
+  background: var(--color-text-light);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  color: var(--color-text-light);
+}

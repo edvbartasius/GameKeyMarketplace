@@ -1,0 +1,105 @@
+/* Custom Navbar Styling */
+.navbar {
+    background: #4618ac !important;
+    /* padding: 0.75rem 0; */
+}
+
+.navbar-brand {
+    font-weight: 750;
+    font-size: 1.5rem;
+    color: #ffffff !important;
+    transition: opacity 0.2s ease;
+}
+
+/* Language Selector */
+.language-selector {
+    color: #ffffff !important;
+    font-size: 1.0rem;
+}
+
+/* User Action Icons */
+.nav-item {
+    color: #ffffff !important;
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+}
+
+.nav-item:hover {
+    opacity: 0.8;
+    color: #fad318 !important;
+}
+
+.nav-item i {
+    font-size: 1.2rem;
+    transform: scale(1.1);
+}
+
+.nav-seperator {
+    color: #ffffff;
+    font-size: 1.2rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* Hamburger icon */
+.hamburger-icon {
+    cursor: pointer;
+    color: #ffffff !important;
+    transition: transform 0.2s;
+}
+
+.hamburger-icon:hover {
+    color: #fad318 !important;
+}
+
+/* Offcanvas styling */
+.offcanvas-body .nav-link {
+    padding: 0.5rem 0.5rem;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.offcanvas-body .nav-link:hover {
+    background-color: #f8f9fa;
+}
+
+/* Search bar full width */
+.form-control {
+    border-radius: 25px;
+    padding: 10px 20px;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Mobile navbar container - fixed height to prevent content shift */
+@media (max-width: 991px) {
+    .navbar-mobile-container {
+        min-height: 4rem;
+    }
+}
+
+/* Mobile search transition */
+.mobile-search-container {
+    animation: slideIn 0.2s ease-out;
+}
+
+.navbar-normal-content {
+    min-height: 3rem;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(+20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

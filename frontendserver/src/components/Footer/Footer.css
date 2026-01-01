@@ -1,0 +1,8 @@
+.footer-info {
+    background-color: var(--color-purple-dark);
+    color: var(--color-white);
+    width: 100%;
+    z-index: 100;
+    text-align: left;
+    font-size: 1rem;
+}

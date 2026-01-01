@@ -1,0 +1,42 @@
+:root {
+    /* Base Colors */
+    --color-background: #4618ac;
+    --color-yellow: #fad318;
+    --color-yellow-hover: #f0a613;
+    --color-purple: #4618ac;
+    --color-purple-dark: #3a1290;
+    --color-purple-hover: #1f0a4d;
+
+    /* Text Colors */
+    --color-text-light: #e0e7ff;
+    --color-text-muted: #94a3b8;
+    --color-text-gradient-start: #ffffff;
+    --color-text-gradient-end: #c4b5fd;
+    --color-text-dark: #000000;
+    --color-white: white;
+
+    /* Background Colors */
+    --bg-card-glass: rgba(255, 255, 255, 0.03);
+    --bg-platform-badge: rgba(0, 0, 0, 0.85);
+    --bg-transparent: transparent;
+    --bg-header: #282c34;
+    --bg-grey: #211d2c;
+
+    /* Accent Colors */
+    --color-accent-purple: rgba(139, 92, 246, 0.3);
+    --color-accent-purple-glow: #8b5cf680;
+    --color-success-green: #22c55e;
+    --color-link-blue: #61dafb;
+
+    /* Border Colors */
+    --border-light: rgba(255, 255, 255, 0.2);
+    --border-light-hover: rgba(255, 255, 255, 0.3);
+
+    /* Sold Out Badge */
+    --bg-sold-out-gradient-start: #ef4444;
+    --bg-sold-out-gradient-end: #dc2626;
+    --shadow-sold-out: rgba(239, 68, 68, 0.4);
+
+    /* Hover States */
+    --bg-button-hover-light: rgba(255, 255, 255, 0.15);
+}

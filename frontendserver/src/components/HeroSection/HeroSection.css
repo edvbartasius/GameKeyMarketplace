@@ -1,0 +1,44 @@
+.hero-section {
+  background-color: var(--color-purple-dark);
+}
+
+.hero-title {
+  background: var(--color-text-light);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800 !important;
+  font-size: 5rem;
+
+  background-clip: text;
+}
+
+.hero-subtitle {
+  color: var(--color-text-light);
+}
+
+.trust-indicators {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-text-light);
+}
+
+.trust-icon-box {
+  width: 1.5em;
+  height: 1.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-size: 1.25rem;
+}
