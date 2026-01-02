@@ -61,7 +61,7 @@ export const SearchBar = () => {
     const handleResultClick = (result: SearchResult) => {
         setSearchTerm(result.title);
         setShowDropdown(false);
-        alert("Game info page not implemented yet");
+        alert(`Clicked on ${result.title}. Game detail page not implemented yet`)
     };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {

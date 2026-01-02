@@ -20,7 +20,8 @@ const GameCards: React.FC<GameCardsProps> = ({ games }) => {
 
             return (
               <Col key={`${game.id}-${game.platform.name}-${game.region}`} className="equal-height-col">
-                <Card className={`game-card rounded-0 ${!game.inStock ? 'sold-out-card' : ''}`}>
+                <Card className={`game-card rounded-0 ${!game.inStock ? 'sold-out-card' : ''}`} 
+                  onClick={() => alert(`Clicked on ${game.name}. Game detail page not implemented yet`)}>
                   <div className="game-card-img-wrapper position-relative">
                     <Card.Img
                       variant="top"

@@ -24,6 +24,9 @@
 .title-row {
     overflow: hidden;
     position: relative;
+    min-height: calc(1.2rem * 1.3 * 2);
+    display: flex;
+    align-items: flex-start;
 }
 
 .sold-out-card {
@@ -40,7 +43,7 @@
     line-height: 1.3;
 }
 
-.game-card:not(.sold-out-card) {
+.game-card {
     cursor: pointer;
 }
 
