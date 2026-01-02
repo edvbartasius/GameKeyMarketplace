@@ -36,6 +36,12 @@ const Navbar = () => {
                                     <i className="bi bi-list fs-3"></i>
                                 </div>
                                 <BootstrapNavbar.Brand as={Link} to="/home" className="d-flex align-items-center gap-2">
+                                    <img
+                                        src="/logo192.png"
+                                        alt="Game Key Marketplace Logo"
+                                        height="32"
+                                        className="d-inline-block align-top"
+                                    />
                                     Game Key Marketplace
                                 </BootstrapNavbar.Brand>
                             </div>

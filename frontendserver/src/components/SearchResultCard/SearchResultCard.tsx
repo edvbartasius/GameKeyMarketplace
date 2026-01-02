@@ -1,7 +1,6 @@
 import React from 'react';
 import { SearchResult } from '../../utils/types';
 import './SearchResultCard.css';
-import { InfoTooltip } from '../InfoTooltip/InfoTooltip';
 
 interface SearchResultCardProps {
   result: SearchResult;
