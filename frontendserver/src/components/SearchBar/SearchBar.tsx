@@ -33,16 +33,12 @@ export const SearchBar = () => {
             }
 
             try {
-                console.log('Search term:', searchTerm);
                 const response = await api.get(`/list?search=${encodeURIComponent(searchTerm)}`);
-                console.log('Search results:', response.data);
                 // API returns { success, count, searchTerm, data: [...] }
                 const results = response.data.data || [];
                 setFilteredResults(results);
-                console.log('Filtered results:', results);
                 setShowDropdown(true);
             } catch (error) {
-                console.error("Error fetching search results:", error);
                 setFilteredResults([]);
                 setShowDropdown(false);
             }
@@ -56,7 +52,6 @@ export const SearchBar = () => {
     }, [searchTerm]);
 
     const handleResultClick = (result: SearchResult) => {
-        console.log('Selected:', result);
         setSearchTerm(result.title);
         setShowDropdown(false);
         alert("Game info page not implemented yet");

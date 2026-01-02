@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
-import GameCards, { Game } from '../GameCards/GameCards';
+import GameCards from '../GameCards/GameCards';
+import { Game } from '../../utils/types';
 import './HorizontalScrollContainer.css';
 
 interface HorizontalScrollContainerProps {

@@ -1,6 +1,6 @@
 const { query, validationResult } = require('express-validator');
 
-// Validation middleware for search query
+// Validation middleware for game search query
 exports.validateSearchQuery = [
     query('search')
         .optional()

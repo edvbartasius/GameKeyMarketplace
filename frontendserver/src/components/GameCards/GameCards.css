@@ -183,7 +183,6 @@
 
 .btn-add-cart {
     background: var(--color-yellow);
-    background-color: var(--color-yellow);
     color: var(--color-text-dark);
     font-size: 1rem;
     font-weight: 750;

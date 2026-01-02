@@ -4,6 +4,8 @@ import HorizontalScrollContainer from "../../components/HorizontalScrollContaine
 import { sampleGames } from "../../utils/gameUtils";
 
 const HomePage = () => {
+  // const [featuredGames, setFeaturedGames] = useState<G>();
+
   return (
     <div>
       <HeroSection />

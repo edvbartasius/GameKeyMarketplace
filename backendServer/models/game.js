@@ -1,14 +1,38 @@
 const pool = require('../src/config/database');
 
 class Game {
-    // Get all games with placeholder data
+    // Get all games
     static async getAll() {
-        // Placeholder data for testing
-        return [
-            { id: 1, title: 'The Witcher 3', platform: 'PC', price: 29.99, genre: 'RPG' },
-            { id: 2, title: 'Cyberpunk 2077', platform: 'PC', price: 39.99, genre: 'Action' },
-            { id: 3, title: 'Red Dead Redemption 2', platform: 'PC', price: 49.99, genre: 'Adventure' }
-        ];
+        const query = `
+        SELECT
+            g.game_id,
+            g.title,
+            p.platform,
+            gr.region,
+            (COUNT(gk.key_code) > 0) AS has_keys,
+            COALESCE(MIN(gk.price), 0.0) AS from_price,
+            (COUNT(d.id) > 0) AS has_discount,
+            COALESCE(MAX(d.discount_percentage), 0) AS discount_percentage,
+            c.allowed_country_codes,
+            gi.image_url
+        FROM game g
+        CROSS JOIN UNNEST(g.platforms) AS p(platform)
+        LEFT JOIN game_image gi ON g.game_id = gi.fk_game_id AND gi.image_type = 'thumbnail'::image_type
+        LEFT JOIN game_region gr ON g.game_id = gr.fk_game_id
+        LEFT JOIN game_key gk ON gr.game_region_id = gk.fk_game_region_id
+        LEFT JOIN discount d ON gk.key_id = d.fk_game_key_id AND NOW() BETWEEN d.start_date AND d.end_date
+        LEFT JOIN LATERAL (
+            SELECT array_agg(c.code ORDER BY c.code) AS allowed_country_codes
+            FROM country c
+            WHERE c.id = ANY (gr.allowed_countries)
+        ) c ON TRUE
+        GROUP BY g.game_id, g.title, g.search_text, p.platform, gr.region, gi.image_url, c.allowed_country_codes
+        ORDER BY random()
+        LIMIT 50;
+        `;
+
+        const result = await pool.query(query);
+        return result.rows;
     }
 
     // Search games by query string
@@ -24,6 +48,7 @@ class Game {
                 SELECT LOWER(unnest(string_to_array($1, ' '))) AS word
             )
             SELECT
+                g.game_id,
                 g.title,
                 p.platform,
                 gr.region,

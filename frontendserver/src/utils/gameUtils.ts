@@ -1,15 +1,81 @@
-import { Game } from '../components/GameCards/GameCards';
+import { Game, GameData, UserCountry } from './types';
+import axios from 'axios';
 
-export const getPlatformIcon = (platformName: string): string => {
-  const iconMap: { [key: string]: string } = {
-    'Steam': 'https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg',
-    'PlayStation': 'https://upload.wikimedia.org/wikipedia/commons/0/00/PlayStation_logo.svg',
-    'Xbox': 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Xbox_one_logo.svg',
-    'Epic Games': 'https://upload.wikimedia.org/wikipedia/commons/3/31/Epic_Games_logo.svg',
-    'GOG': 'https://upload.wikimedia.org/wikipedia/commons/2/2e/GOG.com_logo.svg',
-    'Nintendo': 'https://upload.wikimedia.org/wikipedia/commons/0/0d/Nintendo.svg'
+export const getPlatformIcon = (platformName: string): string | null => {
+  const normalized = platformName.toLowerCase().trim();
+
+  // Map alternative names to canonical platform names
+  const platformAliases: { [key: string]: string } = {
+    'playstation': 'playstation',
+    'psn': 'playstation',
+    'ps': 'playstation',
+    'xbox': 'xbox',
+    'xbl': 'xbox',
+    'xbox live': 'xbox',
+    'steam': 'steam',
+    'epic games': 'epic games',
+    'epic': 'epic games',
+    'gog': 'gog',
+    'gog.com': 'gog',
+    'nintendo': 'nintendo',
+    'switch': 'nintendo'
   };
-  return iconMap[platformName] || '';
+
+  const iconMap: { [key: string]: string } = {
+    'steam': 'https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg',
+    'playstation': 'https://upload.wikimedia.org/wikipedia/commons/0/00/PlayStation_logo.svg',
+    'xbox': 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Xbox_one_logo.svg',
+    'epic games': 'https://upload.wikimedia.org/wikipedia/commons/3/31/Epic_Games_logo.svg',
+    'gog': 'https://upload.wikimedia.org/wikipedia/commons/2/2e/GOG.com_logo.svg',
+    'nintendo': 'https://upload.wikimedia.org/wikipedia/commons/0/0d/Nintendo.svg'
+  };
+
+  const canonicalName = platformAliases[normalized];
+  return canonicalName ? iconMap[canonicalName] : null;
+};
+
+export const getGeoInfo = async (): Promise<UserCountry | null> => {
+    try {
+        const response = await axios.get('https://ipapi.co/json/');
+        const data = response.data;
+        return {
+            countryName: data.country_name,
+            countryCode: data.country_code
+        };
+    } catch (error) {
+        console.error('Error fetching geo info:', error);
+        return null;
+    }
+};
+
+const isValidCountry = (countryCode: string | undefined, allowedCountries: string[] | undefined): boolean => {
+    if (!countryCode || !allowedCountries || allowedCountries.length === 0) {
+        return true; // If no restrictions, assume available
+    }
+    return allowedCountries.includes(countryCode);
+};
+
+// Transform backend GameData to frontend Game type
+export const transformGameData = (gameData: GameData, userCountryCode?: string): Game => {
+  const discountedPrice = gameData.has_discount && gameData.discount_percentage > 0
+    ? gameData.from_price * (1 - gameData.discount_percentage / 100)
+    : null;
+
+  return {
+    id: gameData.game_id,
+    name: `${gameData.title} ${gameData.platform} Key ${gameData.region}`,
+    image: gameData.image_url || 'https://via.placeholder.com/800x600?text=No+Image',
+    platform: {
+      name: gameData.platform,
+      icon: getPlatformIcon(gameData.platform)
+    },
+    price: gameData.from_price,
+    discountedPrice,
+    inStock: gameData.has_keys,
+    region: gameData.region,
+    allowedCountries: gameData.allowed_country_codes,
+    regionAvailable: isValidCountry(userCountryCode, gameData.allowed_country_codes)
+  };
 };
 
 // Sample game data
@@ -81,18 +147,3 @@ export const sampleGames: Game[] = [
     regionAvailable: true
   }
 ];
-
-// Filter games by platform
-export const getGamesByPlatform = (platformName: string): Game[] => {
-  return sampleGames.filter(game => game.platform.name === platformName);
-};
-
-// Filter games by stock status
-export const getInStockGames = (): Game[] => {
-  return sampleGames.filter(game => game.inStock);
-};
-
-// Filter games with discounts
-export const getDiscountedGames = (): Game[] => {
-  return sampleGames.filter(game => game.discountedPrice !== null);
-};
