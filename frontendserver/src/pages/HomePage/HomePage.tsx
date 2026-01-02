@@ -51,6 +51,7 @@ const HomePage = () => {
             <HorizontalScrollContainer games={games}/>
             <div className="text-center mt-4">
               <Button className="btn-add-cart w-50 py-2 rounded-0" onClick={() => {
+                setGames([]); // Clear games to avoid game switching on list page
                 navigate("/list");
                 window.scrollTo(0, 0);
               }}>
