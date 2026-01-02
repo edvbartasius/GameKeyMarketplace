@@ -93,11 +93,11 @@ class Game {
                 END AS region_available,
                 (
                     COALESCE(
-                        SUM(CASE WHEN LOWER(g.title) LIKE '%' || tw.word || '%' THEN 10 ELSE 0 END),
+                        SUM(CASE WHEN LENGTH(tw.word) >= 3 AND LOWER(g.title) LIKE '%' || tw.word || '%' THEN 10 ELSE 0 END),
                         0
                     ) +
                     COALESCE(
-                        SUM(CASE WHEN LOWER(g.title) % tw.word THEN 5 ELSE 0 END),
+                        SUM(CASE WHEN LENGTH(tw.word) >= 3 AND LOWER(g.title) % tw.word THEN 5 ELSE 0 END),
                         0
                     ) +
                     similarity(LOWER(g.title), $1) * 8.0 +
@@ -112,10 +112,14 @@ class Game {
             LEFT JOIN discount d ON gk.key_id = d.fk_game_key_id AND NOW() BETWEEN d.start_date AND d.end_date
             WHERE (
                 NOT EXISTS (SELECT 1 FROM title_words)
-                OR LOWER(g.title) LIKE '%' || tw.word || '%'
-                OR LOWER(g.title) % tw.word
-                OR g.search_text % $1
-                OR similarity(LOWER(g.title), $1) > 0.1
+                OR (
+                    -- Match full search term with good similarity
+                    similarity(LOWER(g.title), $1) > 0.3
+                    OR similarity(g.search_text, $1) > 0.3
+                    -- Or match individual words that are at least 3 characters
+                    OR (LENGTH(tw.word) >= 3 AND LOWER(g.title) LIKE '%' || tw.word || '%')
+                    OR (LENGTH(tw.word) >= 3 AND g.search_text LIKE '%' || tw.word || '%')
+                )
             )
             AND (NOT EXISTS (SELECT 1 FROM platform_filters) OR LOWER(p.platform::text) IN (SELECT platform_name FROM platform_filters))
             AND (NOT EXISTS (SELECT 1 FROM region_filters) OR gr.region::text IN (SELECT region_name FROM region_filters))
@@ -124,11 +128,11 @@ class Game {
                 CASE
                     WHEN EXISTS(SELECT 1 FROM title_words) THEN
                         (
-                            COALESCE(SUM(CASE WHEN LOWER(g.title) LIKE '%' || tw.word || '%' THEN 10 ELSE 0 END), 0) +
-                            COALESCE(SUM(CASE WHEN LOWER(g.title) % tw.word THEN 5 ELSE 0 END), 0) +
+                            COALESCE(SUM(CASE WHEN LENGTH(tw.word) >= 3 AND LOWER(g.title) LIKE '%' || tw.word || '%' THEN 10 ELSE 0 END), 0) +
+                            COALESCE(SUM(CASE WHEN LENGTH(tw.word) >= 3 AND LOWER(g.title) % tw.word THEN 5 ELSE 0 END), 0) +
                             similarity(LOWER(g.title), $1) * 8.0 +
                             similarity(g.search_text, $1) * 6.0
-                        ) > 5.0
+                        ) > 8.0
                     ELSE TRUE
                 END
             )
