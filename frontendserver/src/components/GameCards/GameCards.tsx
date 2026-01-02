@@ -52,18 +52,18 @@ const GameCards: React.FC<GameCardsProps> = ({ games }) => {
                           <div className="mb-3">
                             <div className="d-flex align-items-center gap-2 mb-0 flex-wrap">
                               <span className="from-text">From</span>
-                              <span className="base-price">${game.price.toFixed(2)}</span>
+                              <span className="base-price">€{game.price.toFixed(2)}</span>
                               <span className="discount-percent">-{discountPercent}%</span>
                             </div>
                             <div className="d-flex align-items-center gap-2 pb-1">
-                              <span className="discounted-price">${game.discountedPrice.toFixed(2)}</span>
+                              <span className="discounted-price">€{game.discountedPrice.toFixed(2)}</span>
                               <InfoTooltip text="Price is not final, service fees apply at checkout" />
                             </div>
                           </div>
                         ) : (
                           <div className="mb-3">
                             <div className="d-flex align-items-center gap-2">
-                              <span className="regular-price">${game.price.toFixed(2)}</span>
+                              <span className="regular-price">€{game.price.toFixed(2)}</span>
                               <InfoTooltip text="Price is not final, service fees apply at checkout" />
                             </div>
                           </div>

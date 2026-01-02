@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { SearchResult } from "../../utils/types";
 import api from "../../services/api";
 import "./SearchBar.css";
@@ -6,10 +7,12 @@ import { Button } from "react-bootstrap";
 import { SearchResultCard } from "../SearchResultCard/SearchResultCard";
 
 export const SearchBar = () => {
+    const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [filteredResults, setFilteredResults] = useState<SearchResult[]>([]);
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
     const searchRef = useRef<HTMLDivElement>(null);
+    const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -44,11 +47,15 @@ export const SearchBar = () => {
             }
         };
 
-        const delayDebounce = setTimeout(() => {
+        debounceTimeoutRef.current = setTimeout(() => {
             fetchData();
         }, 300);
 
-        return () => clearTimeout(delayDebounce);
+        return () => {
+            if (debounceTimeoutRef.current) {
+                clearTimeout(debounceTimeoutRef.current);
+            }
+        };
     }, [searchTerm]);
 
     const handleResultClick = (result: SearchResult) => {
@@ -68,15 +75,47 @@ export const SearchBar = () => {
         }
     };
 
+    const handleSearch = async () => {
+        if (!searchTerm.trim()) {
+            return;
+        }
+
+        // Clear any pending debounced search
+        if (debounceTimeoutRef.current) {
+            clearTimeout(debounceTimeoutRef.current);
+        }
+
+        setShowDropdown(false);
+
+        // Fetch fresh results immediately
+        try {
+            const response = await api.get(`/list?search=${encodeURIComponent(searchTerm)}`);
+            const results = response.data.data || [];
+            navigate(`/list?search=${encodeURIComponent(searchTerm)}`, {
+                state: { searchResults: results, searchTerm }
+            });
+        } catch (error) {
+            // Navigate anyway even if the fetch fails
+            navigate(`/list?search=${encodeURIComponent(searchTerm)}`, {
+                state: { searchResults: [], searchTerm }
+            });
+        }
+    };
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        handleSearch();
+    };
+
+    const handleSearchIconClick = () => {
+        handleSearch();
     };
 
     return (
         <div className="search-bar-container" ref={searchRef}>
             <form onSubmit={handleSubmit}>
                 <div className="search-input-wrapper">
-                    <i className="bi bi-search search-icon"></i>
+                    <i className="bi bi-search search-icon" onClick={handleSearchIconClick} style={{ cursor: 'pointer' }}></i>
                     <input
                         type="text"
                         placeholder="Search for games"
@@ -92,7 +131,7 @@ export const SearchBar = () => {
                     {filteredResults.length > 0 ? (
                         <>
                             <div className="results-list">
-                                {filteredResults.map((result) => (
+                                {filteredResults.slice(0, 10).map((result) => (
                                     <SearchResultCard
                                         key={result.id}
                                         result={result}
@@ -104,7 +143,9 @@ export const SearchBar = () => {
                                 className="btn-show-all-results rounded-0 py-2"
                                 onClick={() => {
                                     setShowDropdown(false);
-                                    alert(`Show all results for "${searchTerm}" - Results page not implemented yet`);
+                                    navigate(`/list?search=${encodeURIComponent(searchTerm)}`, {
+                                        state: { searchResults: filteredResults, searchTerm }
+                                    });
                                 }}
                             >
                                 Show All {filteredResults.length} Results
@@ -120,7 +161,7 @@ export const SearchBar = () => {
                                 className="btn-view-all-games rounded-0 py-2"
                                 onClick={() => {
                                     setShowDropdown(false);
-                                    alert(`Show all games page not implemented yet`);
+                                    navigate('/list');
                                 }}
                             >
                                 View All Games

@@ -21,7 +21,7 @@ exports.searchGames = async (req, res, next) => {
     try {
         const { search } = req.query;
         const userCountryCode = req.userCountryCode || null;
-        const results = await Game.search(search, 10, userCountryCode);
+        const results = await Game.search(search, 100, userCountryCode);
 
         res.json({
             success: true,

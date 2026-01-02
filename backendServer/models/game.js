@@ -39,7 +39,7 @@ class Game {
     }
 
     // Search games by query string
-    static async search(searchQuery, limit = 10, userCountryCode = null) {
+    static async search(searchQuery, limit = 100, userCountryCode = null) {
         if (!searchQuery || searchQuery.trim().length === 0) {
             return [];
         }

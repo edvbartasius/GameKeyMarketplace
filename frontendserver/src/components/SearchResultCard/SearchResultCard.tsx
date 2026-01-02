@@ -38,11 +38,11 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onCl
               <div className="price-section">
                 <div className="base-price-row">
                   <span className="from-text-small">From</span>
-                  <span className="base-price-small">${result.from_price.toFixed(2)}</span>
+                  <span className="base-price-small">€{result.from_price.toFixed(2)}</span>
                 </div>
                 <div className="discounted-price-container">
                   <span className="discounted-price-small">
-                    ${(result.from_price * (1 - discountPercent / 100)).toFixed(2)}
+                    €{(result.from_price * (1 - discountPercent / 100)).toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -52,7 +52,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onCl
                   <span className="from-text-small">From</span>
                 </div>
                 <div className="regular-price-container">
-                  <span className="regular-price-small">${result.from_price.toFixed(2)}</span>
+                  <span className="regular-price-small">€{result.from_price.toFixed(2)}</span>
                 </div>
               </div>
             )}

@@ -15,12 +15,10 @@ const api = axios.create({
 // Add response interceptor for error handling
 api.interceptors.response.use(
   async (response) => {
-    await wait(500);
     return response;
   },
   async (error) => {
     console.error('API Error:', error.response?.data || error.message);
-    await wait(500);
     return Promise.reject(error);
   }
 );
