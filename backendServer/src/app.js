@@ -10,8 +10,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-const testRoutes = require('./routes/test');
-app.use('/api/test', testRoutes);
+const listRouter = require('./routes/list');
+app.use('/api/list', listRouter);
 
 // Return JSON instead of HTML for undefined endpoints
 app.use((req, res, next) => {

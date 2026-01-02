@@ -1,7 +1,8 @@
 .search-bar-container {
     flex: 1 1 auto;
-    min-width: 20vw;
+    min-width: 550px;
     max-width: 60vw;
+    position: relative;
 }
 
 .search-input-wrapper {
@@ -33,9 +34,108 @@
     cursor: pointer;
 }
 
+/* Dropdown Styles */
+.search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 0.5rem;
+    background-color: var(--color-purple);
+    border: 2px solid #ffffff;
+    border-radius: 0px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.results-list {
+    padding: 0 0 0.75rem 0;
+    margin: 0;
+}
+
+.no-results {
+    text-align: center;
+    color: var(--color-text-light);
+}
+
+.no-results span {
+    color: var(--color-text-light);
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.no-results .small {
+    color: var(--color-text-muted);
+    font-weight: 600;
+    font-size: 0.8125rem;
+    letter-spacing: 0.3px;
+}
+
+/* Scrollbar Styles */
+.search-dropdown::-webkit-scrollbar {
+    width: 8px;
+}
+
+.search-dropdown::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.search-dropdown::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+
+.search-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
+/* Button Styles */
+.btn-view-all-games {
+    background: var(--color-yellow);
+    background-color: var(--color-yellow);
+    color: var(--color-text-dark);
+    font-size: 1rem;
+    font-weight: 750;
+    letter-spacing: 0.5px;
+    border: none;
+    transition: all 0.3s ease;
+    margin: 0 0.75rem 0.75rem 0.75rem;
+    width: calc(100% - 1.5rem) !important;
+}
+
+.btn-view-all-games:hover {
+    background: var(--color-yellow-hover);
+    color: var(--color-text-dark);
+}
+
+.btn-show-all-results {
+    background: var(--bg-transparent);
+    color: var(--color-text-light);
+    border: 1px solid var(--border-light);
+    font-size: 1rem;
+    font-weight: 750;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    margin: 0 0.75rem 0.75rem 0.75rem;
+    width: calc(100% - 1.5rem) !important;
+}
+
+.btn-show-all-results:hover {
+    background: var(--bg-button-hover-light);
+    border-color: var(--border-light-hover);
+    color: var(--color-text-light);
+}
+
 /* Full width on small screens */
 @media (max-width: 991px) {
     .search-bar-container {
+        min-width: 300px;
         max-width: 100%;
+    }
+
+    .search-dropdown {
+        max-height: 300px;
     }
 }
