@@ -5,32 +5,39 @@
 .game-card {
     background: var(--bg-card-glass);
     backdrop-filter: blur(10px);
+    border: 1px solid rgba(139, 92, 246, 0.3);
     overflow: hidden;
     position: relative;
     height: 100%;
     display: flex;
     flex-direction: column;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.1);
 }
 
-.game-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0);
-    transition: background 0.3s ease;
-    pointer-events: none;
-    z-index: 1;
+.game-card:hover:not(.sold-out-card) {
+    transform: translateY(-8px);
+    border-color: rgba(139, 92, 246, 0.6);
+    box-shadow: 0 20px 60px rgba(139, 92, 246, 0.3);
 }
 
-.game-card:hover:not(.sold-out-card)::before {
-    background: rgba(0, 0, 0, 0.3);
+.title-row {
+    overflow: hidden;
+    position: relative;
 }
 
-.game-card.sold-out-card::before {
-    background: rgba(0, 0, 0, 0.5);
+.sold-out-card {
+    opacity: 0.7;
+}
+
+.game-name {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
 }
 
 .game-card:not(.sold-out-card) {
@@ -84,13 +91,14 @@
 
 .platform-overlay {
     position: absolute;
-    top: -2rem;
+    top: 0;
     left: 0;
     right: 0;
-    background: transparent;
+    background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(8px);
     z-index: 3;
     justify-content: center;
+    transform: translateY(-90%);
 }
 
 .game-card:hover:not(.sold-out-card) .card-info-section {
@@ -135,6 +143,7 @@
     font-size: 1rem;
     text-decoration: line-through;
 }
+
 .price-text {
     color: var(--color-text-light);
     font-size: 1rem;

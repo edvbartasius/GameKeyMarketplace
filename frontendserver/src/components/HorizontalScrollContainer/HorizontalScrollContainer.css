@@ -23,13 +23,6 @@
     overflow-x: auto;
     overflow-y: hidden;
     scroll-behavior: smooth;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-}
-
-.horizontal-scroll-content .row > .col:first-child,
-.horizontal-scroll-content .row > [class*="col-"]:first-child {
-    padding-left: 0 !important;
 }
 
 .horizontal-scroll-content .row::-webkit-scrollbar {

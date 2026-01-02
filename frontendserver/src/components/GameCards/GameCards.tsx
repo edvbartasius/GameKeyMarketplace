@@ -37,47 +37,58 @@ const GameCards: React.FC<GameCardsProps> = ({ games }) => {
                       )}
                       <span className="platform-name">{game.platform.name}</span>
                     </div>
-                    <Card.Title className="game-name mb-0 text-start">{game.name}</Card.Title>
-                    <div className={`region-text mt-1 ${game.regionAvailable ? 'region-available' : 'region-unavailable'}`}>
-                      {game.region}
+                    {/* Row 1: Title with overflow hidden */}
+                    <div className="title-row">
+                      <Card.Title className="game-name mb-0 text-start" title={game.name}>{game.name}</Card.Title>
                     </div>
                     
-                    {!game.inStock ? (
-                      <div className="sold-out-badge text-danger d-inline-block px-0 rounded-0">
-                        Sold Out
+                    {/* Row 2: Region display */}
+                    <div className="region-row mt-1">
+                      <div className={`region-text ${game.regionAvailable ? 'region-available' : 'region-unavailable'}`}>
+                        {game.region}
                       </div>
-                    ) : (
-                      <>
-                        {game.discountedPrice ? (
-                          <div className="mb-3">
-                            <div className="d-flex align-items-center gap-2 mb-0 flex-wrap">
-                              <span className="from-text">From</span>
-                              <span className="base-price">€{game.price.toFixed(2)}</span>
-                              <span className="discount-percent">-{discountPercent}%</span>
-                            </div>
-                            <div className="d-flex align-items-center gap-2 pb-1">
-                              <span className="discounted-price">€{game.discountedPrice.toFixed(2)}</span>
-                              <InfoTooltip text="Price is not final, service fees apply at checkout" />
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="mb-3">
-                            <div className="d-flex align-items-center gap-2">
-                              <span className="regular-price">€{game.price.toFixed(2)}</span>
-                              <InfoTooltip text="Price is not final, service fees apply at checkout" />
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="card-actions d-flex flex-column gap-2">
-                          <Button className="btn-add-cart w-100 py-2 rounded-0" onClick={() => alert("Order cart not implemented yet")}>
-                            Add to Cart
-                          </Button>
-                          <Button className="btn-explore w-100 py-2 rounded-0" onClick={() => alert("Explore options not implemented yet")}>
-                            Explore Options
-                          </Button>
+                    </div>
+                    
+                    {/* Row 3: "From" text with base price crossed out and discount percentage */}
+                    <div className="price-from-row mt-2">
+                      {game.discountedPrice ? (
+                        <div className="d-flex align-items-center gap-2 flex-wrap">
+                          <span className="from-text">From</span>
+                          <span className="base-price">€{game.price.toFixed(2)}</span>
+                          <span className="discount-percent">-{discountPercent}%</span>
                         </div>
-                      </>
+                      ) : (
+                        <div className="d-flex align-items-center gap-2">
+                          <span className="from-text">From</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Row 4: Final price or sold out text */}
+                    <div className="final-price-row mt-0 mb-3">
+                      {!game.inStock ? (
+                        <div className="sold-out-text">
+                          Sold Out
+                        </div>
+                      ) : (
+                        <div className="d-flex align-items-center gap-2">
+                          <span className={game.discountedPrice ? "discounted-price" : "regular-price"}>
+                            €{(game.discountedPrice || game.price).toFixed(2)}
+                          </span>
+                          <InfoTooltip text="Price is not final, service fees apply at checkout" />
+                        </div>
+                      )}
+                    </div>
+
+                    {game.inStock && (
+                      <div className="card-actions d-flex flex-column gap-2">
+                        <Button className="btn-add-cart w-100 py-2 rounded-0" onClick={() => alert("Order cart not implemented yet")}>
+                          Add to Cart
+                        </Button>
+                        <Button className="btn-explore w-100 py-2 rounded-0" onClick={() => alert("Explore options not implemented yet")}>
+                          Explore Options
+                        </Button>
+                      </div>
                     )}
                   </Card.Body>
                 </Card>
