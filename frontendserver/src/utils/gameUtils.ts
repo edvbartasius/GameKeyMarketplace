@@ -64,7 +64,7 @@ export const transformGameData = (gameData: GameData, userCountryCode?: string):
   return {
     id: gameData.game_id,
     name: `${gameData.title} ${gameData.platform} Key ${gameData.region}`,
-    image: gameData.image_url || 'https://via.placeholder.com/800x600?text=No+Image',
+    image: `/images/${gameData.image_url}` || 'https://placehold.co/400x800/4618ac/fad318/png?text=No\nImage',
     platform: {
       name: gameData.platform,
       icon: getPlatformIcon(gameData.platform)
