@@ -93,27 +93,27 @@
 
 /* Button Styles */
 .btn-view-all-games {
-    background: var(--color-yellow);
-    background-color: var(--color-yellow);
-    color: var(--color-text-dark);
+    background: var(--color-yellow) !important;
+    background-color: var(--color-yellow) !important;
+    color: var(--color-text-dark) !important;
     font-size: 1rem;
-    font-weight: 750;
+    font-weight: 750 !important;
     letter-spacing: 0.5px;
-    border: none;
+    border: none !important;
     transition: all 0.3s ease;
     margin: 0 0.75rem 0.75rem 0.75rem;
     width: calc(100% - 1.5rem) !important;
 }
 
 .btn-view-all-games:hover {
-    background: var(--color-yellow-hover);
-    color: var(--color-text-dark);
+    background: var(--color-yellow-hover) !important;
+    color: var(--color-text-dark) !important;
 }
 
 .btn-show-all-results {
-    background: var(--bg-transparent);
+    background: var(--bg-transparent) !important;
     color: var(--color-text-light);
-    border: 1px solid var(--border-light);
+    border: 2px solid var(--border-white) !important;
     font-size: 1rem;
     font-weight: 750;
     letter-spacing: 0.5px;
@@ -123,8 +123,8 @@
 }
 
 .btn-show-all-results:hover {
-    background: var(--bg-button-hover-light);
-    border-color: var(--border-light-hover);
+    background: var(--color-purple-dark) !important;
+    border-color: var(--color-yellow-hover) !important;
     color: var(--color-text-light);
 }
 

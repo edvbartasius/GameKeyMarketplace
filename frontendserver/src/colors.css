@@ -29,6 +29,7 @@
     --color-link-blue: #61dafb;
 
     /* Border Colors */
+    --border-white: #ffffff;
     --border-light: rgba(255, 255, 255, 0.2);
     --border-light-hover: rgba(255, 255, 255, 0.3);
 

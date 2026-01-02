@@ -16,7 +16,8 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onCl
     <div className="search-result-card" onClick={() => onClick(result)}>
       <div className="search-result-image-wrapper">
         <img
-          src={result.image_url}
+          src={`images/${result.image_url}`}
+          // src={result.image_url}
           alt={result.title}
           className="search-result-image"
         />

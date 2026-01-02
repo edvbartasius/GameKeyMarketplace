@@ -58,13 +58,14 @@ class Game {
                 COALESCE(MAX(d.discount_percentage), 0) AS discount_percentage,
                 gi.image_url,
                 (
+                    COUNT(DISTINCT CASE WHEN LOWER(g.title) LIKE '%' || sw.word || '%' THEN sw.word END) * 10.0 +
                     COUNT(DISTINCT CASE WHEN LOWER(g.title) % sw.word THEN sw.word END) * 5.0 +
-                    COUNT(DISTINCT CASE WHEN gr.region IS NOT NULL AND LOWER(gr.region::text) % sw.word THEN sw.word END) * 3.0 +
-                    COUNT(DISTINCT CASE WHEN LOWER(p.platform::text) % sw.word THEN sw.word END) * 3.0 +
-                    MAX(similarity(LOWER(g.title), $1)) * 4.0 +
-                    MAX(similarity(g.search_text, $1)) * 3.0 +
-                    MAX(similarity(LOWER(COALESCE(gr.region::text, '')), $1)) * 2.0 +
-                    MAX(similarity(LOWER(p.platform::text), $1)) * 2.0
+                    MAX(similarity(LOWER(g.title), $1)) * 8.0 +
+                    MAX(similarity(g.search_text, $1)) * 6.0 +
+                    COUNT(DISTINCT CASE WHEN gr.region IS NOT NULL AND LOWER(gr.region::text) % sw.word THEN sw.word END) * 2.0 +
+                    COUNT(DISTINCT CASE WHEN LOWER(p.platform::text) % sw.word THEN sw.word END) * 2.0 +
+                    MAX(similarity(LOWER(COALESCE(gr.region::text, '')), $1)) * 1.0 +
+                    MAX(similarity(LOWER(p.platform::text), $1)) * 1.0
                 ) as relevance
             FROM game g
             CROSS JOIN search_words sw
@@ -73,21 +74,42 @@ class Game {
             LEFT JOIN game_region gr ON g.game_id = gr.fk_game_id
             LEFT JOIN game_key gk ON gr.game_region_id = gk.fk_game_region_id
             LEFT JOIN discount d ON gk.key_id = d.fk_game_key_id AND NOW() BETWEEN d.start_date AND d.end_date
-            WHERE LOWER(g.title) % sw.word
+            WHERE (
+                LOWER(g.title) LIKE '%' || sw.word || '%'
+                OR LOWER(g.title) % sw.word
                 OR (gr.region IS NOT NULL AND LOWER(gr.region::text) % sw.word)
                 OR LOWER(p.platform::text) % sw.word
                 OR g.search_text % $1
+                OR similarity(LOWER(g.title), $1) > 0.1
+            )
+            AND (
+                NOT EXISTS (SELECT 1 FROM search_words WHERE word IN ('steam', 'epic', 'gog', 'origin', 'uplay', 'xbox', 'playstation', 'ps4', 'ps5', 'switch', 'nintendo'))
+                OR p.platform::text ILIKE ANY(SELECT '%' || word || '%' FROM search_words WHERE word IN ('steam', 'epic', 'gog', 'origin', 'uplay', 'xbox', 'playstation', 'ps4', 'ps5', 'switch', 'nintendo'))
+            )
+            AND (
+                NOT EXISTS (SELECT 1 FROM search_words WHERE word IN ('global', 'europe', 'north america', 'asia', 'na', 'eu'))
+                OR gr.region::text ILIKE ANY(SELECT '%' || word || '%' FROM search_words WHERE word IN ('global', 'europe', 'north america', 'asia', 'na', 'eu'))
+            )
             GROUP BY g.game_id, g.title, g.search_text, p.platform, gr.region, gi.image_url
             HAVING (
+                COUNT(DISTINCT CASE WHEN LOWER(g.title) LIKE '%' || sw.word || '%' THEN sw.word END) * 10.0 +
                 COUNT(DISTINCT CASE WHEN LOWER(g.title) % sw.word THEN sw.word END) * 5.0 +
-                COUNT(DISTINCT CASE WHEN gr.region IS NOT NULL AND LOWER(gr.region::text) % sw.word THEN sw.word END) * 3.0 +
-                COUNT(DISTINCT CASE WHEN LOWER(p.platform::text) % sw.word THEN sw.word END) * 3.0 +
-                MAX(similarity(LOWER(g.title), $1)) * 4.0 +
-                MAX(similarity(g.search_text, $1)) * 3.0 +
-                MAX(similarity(LOWER(COALESCE(gr.region::text, '')), $1)) * 2.0 +
-                MAX(similarity(LOWER(p.platform::text), $1)) * 2.0
-            ) > 3.0
-            ORDER BY relevance DESC
+                MAX(similarity(LOWER(g.title), $1)) * 8.0 +
+                MAX(similarity(g.search_text, $1)) * 6.0 +
+                COUNT(DISTINCT CASE WHEN gr.region IS NOT NULL AND LOWER(gr.region::text) % sw.word THEN sw.word END) * 2.0 +
+                COUNT(DISTINCT CASE WHEN LOWER(p.platform::text) % sw.word THEN sw.word END) * 2.0 +
+                MAX(similarity(LOWER(COALESCE(gr.region::text, '')), $1)) * 1.0 +
+                MAX(similarity(LOWER(p.platform::text), $1)) * 1.0
+            ) > 5.0
+            ORDER BY
+                relevance DESC,
+                CASE
+                    WHEN gr.region = 'Global' THEN 1
+                    WHEN gr.region = 'Europe' THEN 2
+                    WHEN gr.region = 'North America' THEN 3
+                    ELSE 4
+                END
+
             LIMIT $2;
         `;
 
