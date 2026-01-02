@@ -3,7 +3,8 @@ const Game = require('../../models/game');
 // Get all games
 exports.getAllGames = async (req, res, next) => {
     try {
-        const games = await Game.getAll();
+        const userCountryCode = req.userCountryCode || null;
+        const games = await Game.getAll(userCountryCode);
 
         res.json({
             success: true,
@@ -19,7 +20,8 @@ exports.getAllGames = async (req, res, next) => {
 exports.searchGames = async (req, res, next) => {
     try {
         const { search } = req.query;
-        const results = await Game.search(search);
+        const userCountryCode = req.userCountryCode || null;
+        const results = await Game.search(search, 10, userCountryCode);
 
         res.json({
             success: true,

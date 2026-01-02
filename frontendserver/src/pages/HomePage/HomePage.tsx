@@ -5,7 +5,7 @@ import HeroSection from "../../components/HeroSection/HeroSection";
 import HorizontalScrollContainer from "../../components/HorizontalScrollContainer/HorizontalScrollContainer";
 import api from "../../services/api";
 import { Game, GameData } from "../../utils/types";
-import { transformGameData, getGeoInfo } from "../../utils/gameUtils";
+import { transformGameData } from "../../utils/gameUtils";
 
 const HomePage = () => {
   const [games, setGames] = useState<Game[]>([]);
@@ -13,18 +13,14 @@ const HomePage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // First, get user country
-      const country = await getGeoInfo();
-
-      // TODO: create backend endpoint to get more customized game list
-      // Instead of filtering in the client
       try {
         const response = await api.get('/list');
         const results: GameData[] = response.data.data || [];
 
         // Transform backend data to frontend Game type and limit to 10
+        // Region availability is now calculated server-side
         const transformedGames = results
-          .map(gameData => transformGameData(gameData, country?.countryCode))
+          .map(gameData => transformGameData(gameData))
           .filter(game => game.regionAvailable === true)
           .slice(0, 10);
         setGames(transformedGames);

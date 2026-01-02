@@ -1,5 +1,4 @@
-import { Game, GameData, UserCountry } from './types';
-import axios from 'axios';
+import { Game, GameData } from './types';
 
 export const getPlatformIcon = (platformName: string): string | null => {
   const normalized = platformName.toLowerCase().trim();
@@ -34,29 +33,8 @@ export const getPlatformIcon = (platformName: string): string | null => {
   return canonicalName ? iconMap[canonicalName] : null;
 };
 
-export const getGeoInfo = async (): Promise<UserCountry | null> => {
-    try {
-        const response = await axios.get('https://ipapi.co/json/');
-        const data = response.data;
-        return {
-            countryName: data.country_name,
-            countryCode: data.country_code
-        };
-    } catch (error) {
-        console.error('Error fetching geo info:', error);
-        return null;
-    }
-};
-
-const isValidCountry = (countryCode: string | undefined, allowedCountries: string[] | undefined): boolean => {
-    if (!countryCode || !allowedCountries || allowedCountries.length === 0) {
-        return true; // If no restrictions, assume available
-    }
-    return allowedCountries.includes(countryCode);
-};
-
 // Transform backend GameData to frontend Game type
-export const transformGameData = (gameData: GameData, userCountryCode?: string): Game => {
+export const transformGameData = (gameData: GameData): Game => {
   const discountedPrice = gameData.has_discount && gameData.discount_percentage > 0
     ? gameData.from_price * (1 - gameData.discount_percentage / 100)
     : null;
@@ -73,8 +51,7 @@ export const transformGameData = (gameData: GameData, userCountryCode?: string):
     discountedPrice,
     inStock: gameData.has_keys,
     region: gameData.region,
-    allowedCountries: gameData.allowed_country_codes,
-    regionAvailable: isValidCountry(userCountryCode, gameData.allowed_country_codes)
+    regionAvailable: gameData.region_available
   };
 };
 

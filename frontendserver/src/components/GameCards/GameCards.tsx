@@ -43,7 +43,7 @@ const GameCards: React.FC<GameCardsProps> = ({ games }) => {
                     </div>
                     
                     {!game.inStock ? (
-                      <div className="sold-out-badge text-white d-inline-block px-0 rounded-0">
+                      <div className="sold-out-badge text-danger d-inline-block px-0 rounded-0">
                         Sold Out
                       </div>
                     ) : (

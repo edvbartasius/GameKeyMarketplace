@@ -16,7 +16,7 @@ export interface GameData{
   title: string;
   platform: string;
   region: string;
-  allowed_country_codes?: string[];
+  region_available: boolean;
   image_url: string;
   from_price: number;
   has_discount: boolean;
@@ -38,11 +38,5 @@ export interface Game {
   discountedPrice: number | null;
   inStock: boolean;
   region: string;
-  allowedCountries?: string[];
-  regionAvailable?: boolean;
-}
-
-export interface UserCountry {
-  countryName: string;
-  countryCode: string;
+  regionAvailable: boolean;
 }

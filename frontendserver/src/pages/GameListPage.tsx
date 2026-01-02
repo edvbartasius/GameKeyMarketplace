@@ -2,17 +2,13 @@ import { useEffect, useState } from "react";
 import GameCards from "../components/GameCards/GameCards";
 import api from "../services/api";
 import { Game, GameData } from "../utils/types";
-import { transformGameData, getGeoInfo } from "../utils/gameUtils";
+import { transformGameData } from "../utils/gameUtils";
 
 export default function GameListPage() {
   const [games, setGames] = useState<Game[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      // First, get user country
-      const country = await getGeoInfo();
-
-      // Then fetch game list
       try {
         console.log('Fetching game list...');
         const response = await api.get('/list');
@@ -20,7 +16,8 @@ export default function GameListPage() {
         console.log('Game list fetched:', results);
 
         // Transform backend data to frontend Game type
-        const transformedGames = results.map(gameData => transformGameData(gameData, country?.countryCode));
+        // Region availability is now calculated server-side
+        const transformedGames = results.map(gameData => transformGameData(gameData));
         setGames(transformedGames);
       } catch (error) {
         console.error('Error fetching game list:', error);

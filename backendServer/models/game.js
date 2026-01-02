@@ -2,7 +2,7 @@ const pool = require('../src/config/database');
 
 class Game {
     // Get all games
-    static async getAll() {
+    static async getAll(userCountryCode = null) {
         const query = `
         SELECT
             g.game_id,
@@ -13,30 +13,33 @@ class Game {
             COALESCE(MIN(gk.price), 0.0) AS from_price,
             (COUNT(d.id) > 0) AS has_discount,
             COALESCE(MAX(d.discount_percentage), 0) AS discount_percentage,
-            c.allowed_country_codes,
-            gi.image_url
+            gi.image_url,
+            CASE
+                WHEN $1::text IS NULL THEN TRUE
+                WHEN gr.allowed_countries IS NULL OR array_length(gr.allowed_countries, 1) IS NULL THEN TRUE
+                ELSE EXISTS (
+                    SELECT 1 FROM country c
+                    WHERE c.id = ANY(gr.allowed_countries)
+                    AND c.code = $1::text
+                )
+            END AS region_available
         FROM game g
         CROSS JOIN UNNEST(g.platforms) AS p(platform)
         LEFT JOIN game_image gi ON g.game_id = gi.fk_game_id AND gi.image_type = 'thumbnail'::image_type
         LEFT JOIN game_region gr ON g.game_id = gr.fk_game_id
         LEFT JOIN game_key gk ON gr.game_region_id = gk.fk_game_region_id
         LEFT JOIN discount d ON gk.key_id = d.fk_game_key_id AND NOW() BETWEEN d.start_date AND d.end_date
-        LEFT JOIN LATERAL (
-            SELECT array_agg(c.code ORDER BY c.code) AS allowed_country_codes
-            FROM country c
-            WHERE c.id = ANY (gr.allowed_countries)
-        ) c ON TRUE
-        GROUP BY g.game_id, g.title, g.search_text, p.platform, gr.region, gi.image_url, c.allowed_country_codes
-        ORDER BY random()
-        LIMIT 50;
+        GROUP BY g.game_id, g.title, g.search_text, p.platform, gr.region, gr.allowed_countries, gi.image_url
+        ORDER BY (COUNT(gk.key_code) > 0) DESC, random()
+        LIMIT 100;
         `;
 
-        const result = await pool.query(query);
+        const result = await pool.query(query, [userCountryCode]);
         return result.rows;
     }
 
     // Search games by query string
-    static async search(searchQuery, limit = 10) {
+    static async search(searchQuery, limit = 10, userCountryCode = null) {
         if (!searchQuery || searchQuery.trim().length === 0) {
             return [];
         }
@@ -46,6 +49,32 @@ class Game {
         const query = `
             WITH search_words AS (
                 SELECT LOWER(unnest(string_to_array($1, ' '))) AS word
+            ),
+            title_words AS (
+                SELECT word FROM search_words
+                WHERE word NOT IN (
+                    SELECT keyword FROM platform_keyword_mapping
+                    UNION
+                    SELECT keyword FROM region_keyword_mapping
+                )
+            ),
+            platform_filters AS (
+                SELECT DISTINCT LOWER(pk.platform_name) AS platform_name
+                FROM platform_keyword_mapping pk
+                CROSS JOIN search_words sw
+                WHERE pk.keyword = sw.word
+                   OR pk.keyword LIKE '%' || sw.word || '%'
+                   OR pk.keyword % sw.word
+                   OR similarity(pk.keyword, sw.word) > 0.3
+            ),
+            region_filters AS (
+                SELECT DISTINCT rkm.region_name
+                FROM region_keyword_mapping rkm
+                CROSS JOIN search_words sw
+                WHERE rkm.keyword = sw.word
+                   OR rkm.keyword LIKE '%' || sw.word || '%'
+                   OR rkm.keyword % sw.word
+                   OR similarity(rkm.keyword, sw.word) > 0.3
             )
             SELECT
                 g.game_id,
@@ -57,63 +86,63 @@ class Game {
                 (COUNT(d.id) > 0) AS has_discount,
                 COALESCE(MAX(d.discount_percentage), 0) AS discount_percentage,
                 gi.image_url,
+                CASE
+                    WHEN $3::text IS NULL THEN TRUE
+                    WHEN gr.allowed_countries IS NULL THEN TRUE
+                    ELSE $3::text = ANY(SELECT code FROM country WHERE id = ANY(gr.allowed_countries))
+                END AS region_available,
                 (
-                    COUNT(DISTINCT CASE WHEN LOWER(g.title) LIKE '%' || sw.word || '%' THEN sw.word END) * 10.0 +
-                    COUNT(DISTINCT CASE WHEN LOWER(g.title) % sw.word THEN sw.word END) * 5.0 +
-                    MAX(similarity(LOWER(g.title), $1)) * 8.0 +
-                    MAX(similarity(g.search_text, $1)) * 6.0 +
-                    COUNT(DISTINCT CASE WHEN gr.region IS NOT NULL AND LOWER(gr.region::text) % sw.word THEN sw.word END) * 2.0 +
-                    COUNT(DISTINCT CASE WHEN LOWER(p.platform::text) % sw.word THEN sw.word END) * 2.0 +
-                    MAX(similarity(LOWER(COALESCE(gr.region::text, '')), $1)) * 1.0 +
-                    MAX(similarity(LOWER(p.platform::text), $1)) * 1.0
-                ) as relevance
+                    COALESCE(
+                        SUM(CASE WHEN LOWER(g.title) LIKE '%' || tw.word || '%' THEN 10 ELSE 0 END),
+                        0
+                    ) +
+                    COALESCE(
+                        SUM(CASE WHEN LOWER(g.title) % tw.word THEN 5 ELSE 0 END),
+                        0
+                    ) +
+                    similarity(LOWER(g.title), $1) * 8.0 +
+                    similarity(g.search_text, $1) * 6.0
+                ) AS relevance
             FROM game g
-            CROSS JOIN search_words sw
+            LEFT JOIN title_words tw ON TRUE
             CROSS JOIN UNNEST(g.platforms) AS p(platform)
             LEFT JOIN game_image gi ON g.game_id = gi.fk_game_id AND gi.image_type = 'thumbnail'::image_type
             LEFT JOIN game_region gr ON g.game_id = gr.fk_game_id
             LEFT JOIN game_key gk ON gr.game_region_id = gk.fk_game_region_id
             LEFT JOIN discount d ON gk.key_id = d.fk_game_key_id AND NOW() BETWEEN d.start_date AND d.end_date
             WHERE (
-                LOWER(g.title) LIKE '%' || sw.word || '%'
-                OR LOWER(g.title) % sw.word
-                OR (gr.region IS NOT NULL AND LOWER(gr.region::text) % sw.word)
-                OR LOWER(p.platform::text) % sw.word
+                NOT EXISTS (SELECT 1 FROM title_words)
+                OR LOWER(g.title) LIKE '%' || tw.word || '%'
+                OR LOWER(g.title) % tw.word
                 OR g.search_text % $1
                 OR similarity(LOWER(g.title), $1) > 0.1
             )
-            AND (
-                NOT EXISTS (SELECT 1 FROM search_words WHERE word IN ('steam', 'epic', 'gog', 'origin', 'uplay', 'xbox', 'playstation', 'ps4', 'ps5', 'switch', 'nintendo'))
-                OR p.platform::text ILIKE ANY(SELECT '%' || word || '%' FROM search_words WHERE word IN ('steam', 'epic', 'gog', 'origin', 'uplay', 'xbox', 'playstation', 'ps4', 'ps5', 'switch', 'nintendo'))
-            )
-            AND (
-                NOT EXISTS (SELECT 1 FROM search_words WHERE word IN ('global', 'europe', 'north america', 'asia', 'na', 'eu'))
-                OR gr.region::text ILIKE ANY(SELECT '%' || word || '%' FROM search_words WHERE word IN ('global', 'europe', 'north america', 'asia', 'na', 'eu'))
-            )
-            GROUP BY g.game_id, g.title, g.search_text, p.platform, gr.region, gi.image_url
+            AND (NOT EXISTS (SELECT 1 FROM platform_filters) OR LOWER(p.platform::text) IN (SELECT platform_name FROM platform_filters))
+            AND (NOT EXISTS (SELECT 1 FROM region_filters) OR gr.region::text IN (SELECT region_name FROM region_filters))
+            GROUP BY g.game_id, g.title, g.search_text, p.platform, gr.region, gr.allowed_countries, gi.image_url
             HAVING (
-                COUNT(DISTINCT CASE WHEN LOWER(g.title) LIKE '%' || sw.word || '%' THEN sw.word END) * 10.0 +
-                COUNT(DISTINCT CASE WHEN LOWER(g.title) % sw.word THEN sw.word END) * 5.0 +
-                MAX(similarity(LOWER(g.title), $1)) * 8.0 +
-                MAX(similarity(g.search_text, $1)) * 6.0 +
-                COUNT(DISTINCT CASE WHEN gr.region IS NOT NULL AND LOWER(gr.region::text) % sw.word THEN sw.word END) * 2.0 +
-                COUNT(DISTINCT CASE WHEN LOWER(p.platform::text) % sw.word THEN sw.word END) * 2.0 +
-                MAX(similarity(LOWER(COALESCE(gr.region::text, '')), $1)) * 1.0 +
-                MAX(similarity(LOWER(p.platform::text), $1)) * 1.0
-            ) > 5.0
-            ORDER BY
-                relevance DESC,
                 CASE
-                    WHEN gr.region = 'Global' THEN 1
-                    WHEN gr.region = 'Europe' THEN 2
-                    WHEN gr.region = 'North America' THEN 3
-                    ELSE 4
+                    WHEN EXISTS(SELECT 1 FROM title_words) THEN
+                        (
+                            COALESCE(SUM(CASE WHEN LOWER(g.title) LIKE '%' || tw.word || '%' THEN 10 ELSE 0 END), 0) +
+                            COALESCE(SUM(CASE WHEN LOWER(g.title) % tw.word THEN 5 ELSE 0 END), 0) +
+                            similarity(LOWER(g.title), $1) * 8.0 +
+                            similarity(g.search_text, $1) * 6.0
+                        ) > 5.0
+                    ELSE TRUE
                 END
-
+            )
+            ORDER BY
+                CASE
+                    WHEN $3::text IS NOT NULL AND $3::text = ANY(SELECT code FROM country WHERE id = ANY(gr.allowed_countries)) THEN 1
+                    WHEN gr.region = 'Global' THEN 2
+                    ELSE 3
+                END,
+                relevance DESC
             LIMIT $2;
         `;
 
-        const result = await pool.query(query, [search, limit]);
+        const result = await pool.query(query, [search, limit, userCountryCode]);
         return result.rows;
     }
 }
