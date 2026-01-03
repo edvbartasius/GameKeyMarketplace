@@ -100,27 +100,18 @@ The React development server will run on `http://localhost:3300` (or the port sp
 
 ### Fuzzy Search for Games
 
-The application features a powerful search system that allows users to find games easily:
-
-- **Real-time Search**: As you type in the search bar, results appear instantly with a 300ms debounce for optimal performance
-- **Fuzzy Matching**: The search algorithm intelligently matches game titles even with typos or partial matches
+- **Real-time Search**: As you type in the search bar, results appear
+- **Fuzzy Matching**: The search algorithm matches game titles even with typos or partial matches
 - **Platform & Region Filtering**: Search results can include platform-specific (PC, PlayStation, Xbox, etc.) and region-specific results
 - **Dropdown Preview**: View up to 10 instant results in a dropdown as you type
-- **Full Results Page**: Click "Show All Results" to view all matching games on a dedicated results page
-- **Search Suggestions**: If no results are found, the app provides helpful suggestions and allows browsing the full catalog
+- **Full Results Page**: Click "Show All Results" to view all matching games on a dedicated results page'
+- **Dynamic Region Availability**: Game region availability calculated by users IP address
 
 ### Browse Games
 
 - View featured games on the home page
 - Navigate to the game list page to see all available games
 - Each game displays with relevant information including title, platform, and region availability
-
-### User Interface Features
-
-- **Responsive Design**: Built with Bootstrap and React Bootstrap for mobile-friendly layouts
-- **Country Flags**: Visual region indicators using flag icons
-- **Loading States**: Smooth loading animations for better user experience
-- **Navigation**: Easy-to-use navbar with routing between pages
 
 ## Technology Stack
 
@@ -157,7 +148,3 @@ The application features a powerful search system that allows users to find game
 
 - `GET /api/list` - Retrieve all games
 - `GET /api/list?search=<query>` - Search for games with fuzzy matching
-
-## License
-
-ISC
