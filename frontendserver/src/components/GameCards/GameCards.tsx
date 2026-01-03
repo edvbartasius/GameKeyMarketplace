@@ -83,10 +83,10 @@ const GameCards: React.FC<GameCardsProps> = ({ games }) => {
 
                     {game.inStock && (
                       <div className="card-actions d-flex flex-column gap-2">
-                        <Button className="btn-add-cart w-100 py-2 rounded-0" onClick={() => alert("Order cart not implemented yet")}>
+                        <Button className="btn-add-cart w-100 py-2 rounded-0" onClick={(e) => { e.stopPropagation(); alert("Order cart not implemented yet"); }}>
                           Add to Cart
                         </Button>
-                        <Button className="btn-explore w-100 py-2 rounded-0" onClick={() => alert("Explore options not implemented yet")}>
+                        <Button className="btn-explore w-100 py-2 rounded-0" onClick={(e) => { e.stopPropagation(); alert("Explore options not implemented yet"); }}>
                           Explore Options
                         </Button>
                       </div>
