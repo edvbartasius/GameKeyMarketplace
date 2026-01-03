@@ -133,7 +133,7 @@ export const SearchBar = () => {
                             <div className="results-list">
                                 {filteredResults.slice(0, 10).map((result) => (
                                     <SearchResultCard
-                                        key={result.id}
+                                        key={`${result.id}-${result.platform}-${result.region}`}
                                         result={result}
                                         onClick={handleResultClick}
                                     />

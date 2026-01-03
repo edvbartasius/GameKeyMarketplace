@@ -32,6 +32,12 @@
   color: var(--color-text-light);
 }
 
+@media (max-width: 768px) {
+  .trust-indicators {
+    display: none;
+  }
+}
+
 .trust-icon-box {
   width: 1.5em;
   height: 1.5em;
