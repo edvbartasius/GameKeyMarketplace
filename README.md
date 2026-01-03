@@ -79,6 +79,8 @@ From the `backendServer` directory:
 ```bash
 # Production mode
 npm start
+# Or
+node server.js
 
 # Development mode (with auto-reload)
 npm run dev
@@ -131,18 +133,6 @@ The React development server will run on `http://localhost:3300` (or the port sp
 - CORS
 - Express Rate Limiter
 - Express Validator
-
-## Available Scripts
-
-### Backend
-- `npm start` - Start the production server
-- `npm run dev` - Start the development server with nodemon
-
-### Frontend
-- `npm start` - Start the development server
-- `npm run build` - Build the app for production
-- `npm test` - Run tests
-- `npm run eject` - Eject from Create React App (one-way operation)
 
 ## API Endpoints
 
