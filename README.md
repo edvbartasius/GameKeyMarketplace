@@ -107,7 +107,6 @@ The React development server will run on `http://localhost:3300` (or the port sp
 - **Platform & Region Filtering**: Search results can include platform-specific (PC, PlayStation, Xbox, etc.) and region-specific results
 - **Dropdown Preview**: View up to 10 instant results in a dropdown as you type
 - **Full Results Page**: Click "Show All Results" to view all matching games on a dedicated results page'
-- **Dynamic Region Availability**: Game region availability calculated by users IP address
 
 ### Browse Games
 
