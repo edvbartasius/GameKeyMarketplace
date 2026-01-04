@@ -127,7 +127,13 @@ class Game {
             HAVING (
                 CASE
                     WHEN EXISTS(SELECT 1 FROM title_words) THEN
+                        -- Require ALL search words to match in the game title
                         (
+                            SELECT COUNT(DISTINCT tw2.word)
+                            FROM title_words tw2
+                            WHERE (LOWER(g.title) LIKE '%' || tw2.word || '%' OR g.search_text LIKE '%' || tw2.word || '%')
+                        ) = (SELECT COUNT(DISTINCT word) FROM title_words)
+                        AND (
                             COALESCE(SUM(CASE WHEN LENGTH(tw.word) >= 3 AND LOWER(g.title) LIKE '%' || tw.word || '%' THEN 10 ELSE 0 END), 0) +
                             COALESCE(SUM(CASE WHEN LENGTH(tw.word) >= 3 AND LOWER(g.title) % tw.word THEN 5 ELSE 0 END), 0) +
                             similarity(LOWER(g.title), $1) * 8.0 +
